@@ -10,10 +10,13 @@ The included makefile should be able to compile the c files into a working binar
 ## Usage
 There are no mandatory arguments when running c-doku, however there is an optional argument for difficulty level. By defauly c-doku opens with a difficulty level of medium, but easy and hard can also be specified.
 
-| Level         | Pre-filled squares |
-| `easy`        | 40                 |
-| `medium`      | 35                 |
-| `hard`        | 30                 |
+| Level                         | Pre-filled squares                                                 |
+|:------------------------------|:-------------------------------------------------------------------|
+| `easy`                        | 40                 |
+| `medium`                      | 35                 |
+| `hard`                        | 30                 |
+
+When saving, the game will be stored in the ~/.grid.cdoku file. When reopening the application, C-doku will try to find your saved grid in this file, and if there is no grid present, it will start with a blank grid. 
 
 ## Key bindings
 C-doku has vim-like keybindings. See the image or table below. 
