@@ -1,6 +1,6 @@
 # C-doku
 
-![Preview](https://i.imgur.com/e51hLYw.gifv)
+![Preview](https://i.imgur.com/e51hLYw.gif)
 
 A command line sudoku game written in C. It can generate new games, solve games, validate games, and tell if there is a single solution to a game (thus validating new games). The game itself uses the [ncurses](https://www.gnu.org/software/ncurses/) library, and the tests rely on [cmocka](https://cmocka.org/). 
 
