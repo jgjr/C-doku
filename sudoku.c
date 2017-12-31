@@ -184,9 +184,9 @@ bool find_solution(Grid* grid, int current_blank) {
     int current_square = grid->blanks[current_blank];
     int entry = find_incremented_valid_entry(grid, current_square, grid->values[current_square]);
     if (entry != 0) {
-        find_solution(grid, current_blank + 1);
-    } else if(current_blank > 0) {
-        find_solution(grid, current_blank - 1);
+        return find_solution(grid, current_blank + 1);
+    } else if(entry == 0 && current_blank > 0) {
+        return find_solution(grid, current_blank - 1);
     } else {
         return false;
     }

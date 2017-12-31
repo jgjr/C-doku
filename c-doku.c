@@ -67,12 +67,32 @@ void redo(Grids grids) {
 
 int main(int argc, char *argv[]){
 
+
+    /* Display a help message if the -h option is specified */
+    if (argc > 1 && (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0)) {
+        printf("\nUsage:\n");
+        printf("c-doku [-h/--help] - displays this help message\n");
+        printf("c-doku - opens saved game, or new medium grid if no file is present\n");
+        printf("c-soku [easy/medium/hard] - opens a new game with desired difficulty level\n");
+        printf("\nUseful keybindings:\n");
+        printf("n - new game\n");
+        printf("s - solve game\n");
+        printf("x - clear grid\n");
+        printf("v - validate grid\n");
+        printf("c - check if grid is complete\n");
+        printf("For complete list see README.md\n");
+        printf("\n");
+        return 0;
+    }
+
+
     /* Setup for ncurses and random number generation */
     srand(time(NULL));
     initscr();
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
+
 
     /* Setup for the grid file */
     char* grid_file_path;
@@ -81,10 +101,12 @@ int main(int argc, char *argv[]){
     strcpy(grid_file_path, getenv("HOME"));
     strcat(grid_file_path, grid_file_name);
 
+
     /* The key pressed by the user and its integer representation */
     char c;
     int c_int;
     int filled = 35;
+
 
     Position position = { .x = 0, .y = 0 };
     Grid* grid = new_blank_grid();
@@ -93,27 +115,34 @@ int main(int argc, char *argv[]){
     int undo_level = 0;
     Grids grids = { .grid = grid, .undo_grid = undo_grid, .redo_grid = redo_grid, .undo_level = &undo_level };
     
-    open_grid(grid, grid_file_path);
+
+    bool existing_grid = open_grid(grid, grid_file_path);
     store_undo(grids);
     print_grid(grid); 
 
+
     /* If a difficulty level has been specified */
-    if (argc > 1) {
-        if(strcmp(argv[1], "easy") == 0) {
-            filled = 40;
-            new_game(grid, filled);
-        } else if(strcmp(argv[1], "medium") == 0) {
-            filled = 35;
-            new_game(grid, filled);
-        } else if(strcmp(argv[1], "hard") == 0) {
-            filled = 30;
-            new_game(grid, filled);
-        }
+    if(argc > 1 && strcmp(argv[1], "easy") == 0) {
+        filled = 40;
+    } else if(argc > 1 && strcmp(argv[1], "medium") == 0) {
+        filled = 35;
+    } else if(argc > 1 && strcmp(argv[1], "hard") == 0) {
+        filled = 30;
     }
 
+
+    if (existing_grid == false) {
+        new_game(grid, filled);
+    }
     print_grid(grid); 
     make_move(0, 0, &position);
-    
+    if (existing_grid == true) {
+        print_message("SAVED GRID OPENED", &position);
+    } else {
+        print_message("NEW GAME", &position);
+    }
+
+
     while((c = getch()) != 'q') {
         switch(c) {
             case 4:
@@ -238,8 +267,6 @@ int main(int argc, char *argv[]){
     }
 
     endwin();
-    free(grid);
-    free(grid_file_path);
 
     return 0;
 }
