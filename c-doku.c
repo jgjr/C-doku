@@ -42,15 +42,15 @@ typedef struct Grids {
 
 void store_undo(Grids grids) {
     *grids.undo_level = 0;
-    replace_grid(*grids.grid, grids.undo_grid);
+    replace_grid(grids.grid, grids.undo_grid);
 }
 
 
 void undo(Grids grids) {
     if (*grids.undo_level >= 0) {
         *grids.undo_level = -1;
-        replace_grid(*grids.grid, grids.redo_grid);
-        replace_grid(*grids.undo_grid, grids.grid);
+        replace_grid(grids.grid, grids.redo_grid);
+        replace_grid(grids.undo_grid, grids.grid);
     }
 }
 
@@ -58,8 +58,8 @@ void undo(Grids grids) {
 void redo(Grids grids) {
     if (*grids.undo_level <= 0) {
         *grids.undo_level = 1;
-        replace_grid(*grids.grid, grids.undo_grid);
-        replace_grid(*grids.redo_grid, grids.grid);
+        replace_grid(grids.grid, grids.undo_grid);
+        replace_grid(grids.redo_grid, grids.grid);
     }
 }
 
@@ -96,61 +96,64 @@ int main(int argc, char *argv[]){
     if (argc > 1) {
         if(strcmp(argv[1], "easy") == 0) {
             filled = 40;
+            new_game(grid, filled);
         } else if(strcmp(argv[1], "medium") == 0) {
             filled = 35;
+            new_game(grid, filled);
         } else if(strcmp(argv[1], "hard") == 0) {
             filled = 30;
+            new_game(grid, filled);
         }
-        Grid* new_grid = new_game(filled);
-        replace_grid(*new_grid, grid);
-        print_grid(grid); 
     }
 
+    print_grid(grid); 
     make_move(0, 0, &position);
     
     while((c = getch()) != 'q') {
         switch(c) {
+            case 4:
             case 'h':
                 make_move(-1, 0, &position);
                 break;
+            case 2:
             case 'j':
                 make_move(0, 1, &position);
                 break;
+            case 3:
             case 'k':
                 make_move(0, -1, &position);
                 break;
+            case 5:
             case 'l':
                 make_move(1, 0, &position);
                 break;
             case 'w':
                 save_grid(grid, grid_file_path);
-                print_message("SAVED", position);
+                print_message("SAVED", &position);
                 break;
             case 'n':
                 store_undo(grids);
-                Grid* new_grid = new_game(filled);
-                replace_grid(*new_grid, grid);
-                free(new_grid);
+                new_game(grid, filled);
                 print_grid(grid);
-                print_message("NEW GAME", position);
+                print_message("NEW GAME", &position);
                 break;
             case 's':
                 store_undo(grids);
                 if (solve_game(grid) == true) {
                     print_grid(grid);
-                    print_message("SOLVED", position);
+                    print_message("SOLVED", &position);
                 } else {
                     print_grid(grid);
-                    print_message("INVALID", position);
+                    print_message("INVALID", &position);
                 }
                 break;
             case 'm':
-                if(is_grid_valid(*grid) == false) {
-                    print_message("INVALID", position);
+                if(is_grid_valid(grid) == false) {
+                    print_message("INVALID", &position);
                 } else if (is_new_grid_valid(*grid) == true) {
-                    print_message("SINGLE SOLUTION", position);
+                    print_message("SINGLE SOLUTION", &position);
                 } else {
-                    print_message("MULTIPLE SOLUTIONS", position);
+                    print_message("MULTIPLE SOLUTIONS", &position);
                 }
                 break;
             case 'x':
@@ -158,22 +161,22 @@ int main(int argc, char *argv[]){
                 clear_grid(grid);
                 print_grid(grid);
                 make_move(0, 0, &position);
-                print_message("GRID CLEARED", position);
+                print_message("GRID CLEARED", &position);
                 break;
             case 'v':
-                if(is_grid_valid(*grid) == true) {
-                    print_message("VALID", position);
+                if(is_grid_valid(grid) == true) {
+                    print_message("VALID", &position);
                 } else {
-                    print_message("INVALID", position);
+                    print_message("INVALID", &position);
                 }
                 break;
             case 'c':
-                if(is_grid_valid(*grid) == false) {
-                    print_message("INVALID", position);
-                } else if(is_grid_complete(*grid) == 0) {
-                    print_message("INCOMPLETE", position);
+                if(is_grid_valid(grid) == false) {
+                    print_message("INVALID", &position);
+                } else if(is_grid_complete(grid) == 0) {
+                    print_message("INCOMPLETE", &position);
                 } else {
-                    print_message("COMPLETE", position);
+                    print_message("COMPLETE", &position);
                 }
                 break;
             case 'u':
@@ -187,11 +190,11 @@ int main(int argc, char *argv[]){
                 make_move(0, 0, &position);
                 break;
             case ' ':
-                print_message("", position);
+                print_message("", &position);
                 break;
             case 'd':
                 store_undo(grids);
-                add_number(grid, 0, position);
+                add_number(grid, 0, &position);
                 break;
             case '\t':
                 if (position.x + 3 < 9) {
@@ -223,7 +226,7 @@ int main(int argc, char *argv[]){
                 c_int = c - '0';
                 if(c_int >= 0 && c_int <= 9) {
                     store_undo(grids);
-                    add_number(grid, c_int, position);
+                    add_number(grid, c_int, &position);
                 }
                 break;
         }

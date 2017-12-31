@@ -25,15 +25,15 @@ void print_grid(Grid* grid) {
 }
 
 
-int* get_cursor_position(Position position) {
+int* get_cursor_position(Position* position) {
     int* cursor = malloc(sizeof(int) * 2);
-    cursor[1] = (position.x * 2) + 1;
-    cursor[0] = position.y + 1 + (position.y / 3);
+    cursor[1] = (position->x * 2) + 1;
+    cursor[0] = position->y + 1 + (position->y / 3);
     return cursor;
 }
 
 
-void position_cursor(Position position) {
+void position_cursor(Position* position) {
     int* cursor_position = get_cursor_position(position);
     move(cursor_position[0], cursor_position[1]);
     refresh();
@@ -49,22 +49,22 @@ void make_move(int direction_x, int direction_y, Position* position) {
     {
         position->x += direction_x;
         position->y += direction_y;
-        position_cursor(*position);
+        position_cursor(position);
     }
 }
 
 
-void add_number(Grid* grid, int c, Position position) {
-    int grid_position = (position.y * 9) + position.x;
+void add_number(Grid* grid, int c, Position* position) {
+    int grid_position = (position->y * 9) + position->x;
     grid->values[grid_position] = c;
     print_grid(grid);
-    make_move(0, 0, &position);
+    make_move(0, 0, position);
 }
 
 
-void print_message(char* message, Position position) {
+void print_message(char* message, Position* position) {
     move(14, 0);
     clrtoeol();
     printw("%s", message);
-    make_move(0, 0, &position);
+    make_move(0, 0, position);
 }
