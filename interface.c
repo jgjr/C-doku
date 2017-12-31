@@ -5,10 +5,10 @@
 void print_grid(Grid* grid) {
     erase();
     printw("+-----+-----+-----+\n");
-    for (int row_i = 0; row_i < 9; row_i++) {
+    for (int row_i = 0; row_i < GROUP_SIZE; row_i++) {
         printw("|");
-        for (int column_i = 0; column_i < 9; column_i++) {
-            int grid_position = (row_i * 9) + column_i;
+        for (int column_i = 0; column_i < GROUP_SIZE; column_i++) {
+            int grid_position = (row_i * GROUP_SIZE) + column_i;
             if (grid->values[grid_position] == 0)
                 printw(" ");
             else
@@ -43,9 +43,9 @@ void position_cursor(Position* position) {
 
 void make_move(int direction_x, int direction_y, Position* position) {
     if (position->x + direction_x >= 0 &&
-        position->x + direction_x <= 9 - 1 &&
+        position->x + direction_x <= GROUP_SIZE - 1 &&
         position->y + direction_y >= 0  &&
-        position->y + direction_y <= 9 - 1)
+        position->y + direction_y <= GROUP_SIZE - 1)
     {
         position->x += direction_x;
         position->y += direction_y;
@@ -55,7 +55,7 @@ void make_move(int direction_x, int direction_y, Position* position) {
 
 
 void add_number(Grid* grid, int c, Position* position) {
-    int grid_position = (position->y * 9) + position->x;
+    int grid_position = (position->y * GROUP_SIZE) + position->x;
     grid->values[grid_position] = c;
     print_grid(grid);
     make_move(0, 0, position);

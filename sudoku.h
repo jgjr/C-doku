@@ -3,6 +3,9 @@
 #ifndef SUDOKU_FUNCTIONS_H_
 #define SUDOKU_FUNCTIONS_H_
 
+#define GRID_SIZE 81
+#define GROUP_SIZE 9
+
 typedef struct Position {
    int x;
    int y;
@@ -14,21 +17,19 @@ typedef struct Movement {
 } Movement;
 
 typedef struct Grid {
-   int values[81];
-   int blanks[81];
+   int values[GRID_SIZE];
+   int blanks[GRID_SIZE];
    int blank_count;
 } Grid;
 
 typedef struct Group {
-   int values[9];
+   int values[GROUP_SIZE];
    int count;
 } Group;
 
 Grid* new_blank_grid();
 
 void clear_grid(Grid* grid);
-
-Grid* clone_grid(Grid source_grid);
 
 void replace_grid(Grid* source_grid, Grid* dest_grid);
 

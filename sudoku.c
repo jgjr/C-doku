@@ -14,27 +14,16 @@ Grid* new_blank_grid() {
 
 
 void clear_grid(Grid* grid) {
-    for (int grid_i = 0; grid_i < 81; grid_i++) {
+    for (int grid_i = 0; grid_i < GRID_SIZE; grid_i++) {
         grid->values[grid_i] = 0;
         grid->blanks[grid_i] = grid_i;
     } 
-    grid->blank_count = 81;
-}
-
-
-Grid* clone_grid(Grid source_grid) {
-    Grid* dest_grid = new_blank_grid();
-    for (int grid_i = 0; grid_i < 81; grid_i++) {
-        dest_grid->values[grid_i] = source_grid.values[grid_i];
-        dest_grid->blanks[grid_i] = source_grid.blanks[grid_i];
-    } 
-    dest_grid->blank_count = source_grid.blank_count;
-    return dest_grid;
+    grid->blank_count = GRID_SIZE;
 }
 
 
 void replace_grid(Grid* source_grid, Grid* dest_grid) {
-    for (int grid_i = 0; grid_i < 81; grid_i++) {
+    for (int grid_i = 0; grid_i < GRID_SIZE; grid_i++) {
         dest_grid->values[grid_i] = source_grid->values[grid_i];
         dest_grid->blanks[grid_i] = source_grid->blanks[grid_i];
     } 
@@ -43,9 +32,9 @@ void replace_grid(Grid* source_grid, Grid* dest_grid) {
 
 
 bool check_rows(Grid* grid) {
-    for (int row_start = 0; row_start < 81; row_start += 9) {
+    for (int row_start = 0; row_start < GRID_SIZE; row_start += GROUP_SIZE) {
         Group row = {.values = {0}, .count = 0};
-        for (int row_item = row_start; row_item < row_start + 9; row_item++) {
+        for (int row_item = row_start; row_item < row_start + GROUP_SIZE; row_item++) {
             row.values[row.count] = grid->values[row_item];
             row.count++;
         }
@@ -57,9 +46,9 @@ bool check_rows(Grid* grid) {
 
 
 bool check_cols(Grid* grid) {
-    for (int col_start = 0; col_start < 9; col_start++) {
+    for (int col_start = 0; col_start < GROUP_SIZE; col_start++) {
         Group col = {.values = {0}, .count = 0};
-        for (int col_item = col_start; col_item < 81; col_item += 9) {
+        for (int col_item = col_start; col_item < GRID_SIZE; col_item += GROUP_SIZE) {
             col.values[col.count] = grid->values[col_item];
             col.count++;
         }
@@ -73,16 +62,16 @@ bool check_cols(Grid* grid) {
 bool check_boxes(Grid* grid) {
     Group box = {.values = {0}, .count = 0};
     for (int box_i = 0; box_i < 27; box_i++) {
-        int box_x = ((box_i / 9) * 3) + (box_i % 3);
+        int box_x = ((box_i / GROUP_SIZE) * 3) + (box_i % 3);
         for (int box_j = 0; box_j < 3; box_j++) {
-            Position pos = {.x = box_x, .y = ((box_i % 9) / 3) * 3 + box_j};
+            Position pos = {.x = box_x, .y = ((box_i % GROUP_SIZE) / 3) * 3 + box_j};
             box.values[box.count] = get_grid_value(grid, pos);
             box.count++;
-            if(box.count == 9) {
+            if(box.count == GROUP_SIZE) {
                 if (group_has_duplicates(box) == true) {
                     return false;
                 } else {
-                    memset(box.values, 0, 9 * sizeof(int));
+                    memset(box.values, 0, GROUP_SIZE * sizeof(int));
                     box.count = 0;
                 }
             }
@@ -112,7 +101,7 @@ bool is_grid_complete(Grid* grid) {
 
 
 int find_random_valid_entry(Grid* grid, int square) {
-    int tried[9] = {0};
+    int tried[GROUP_SIZE] = {0};
     int tried_count = 0;
     int ret = 0;
     while(tried_count <= 8) {
@@ -134,7 +123,7 @@ int find_random_valid_entry(Grid* grid, int square) {
 int find_incremented_valid_entry(Grid* grid, int square, int start) {
     int ret = 0;
     int val = start + 1;
-    while(val <= 9) {
+    while(val <= GROUP_SIZE) {
         grid->values[square] = val;
         if (is_grid_valid(grid) == true) {
             ret = val;
@@ -151,15 +140,15 @@ void new_complete_grid(Grid* grid) {
     clear_grid(grid);
     int i = 0;
     int last_backtrack = 0;
-    while(i < 81) {
+    while(i < GRID_SIZE) {
         int entry = find_random_valid_entry(grid, i);
         if (entry) {
             i++;
         } else {
-            i = (i / 9) * 9;
-            if(i == last_backtrack && i >= 9)
-                i -= 9;
-            for (int grid_i = i; grid_i < 81; grid_i++)
+            i = (i / GROUP_SIZE) * GROUP_SIZE;
+            if(i == last_backtrack && i >= GROUP_SIZE)
+                i -= GROUP_SIZE;
+            for (int grid_i = i; grid_i < GRID_SIZE; grid_i++)
                 grid->values[grid_i] = 0;
             last_backtrack = i;
         }
@@ -170,7 +159,7 @@ void new_complete_grid(Grid* grid) {
 
 void new_game(Grid* grid, int filled) {
     new_complete_grid(grid);
-    while(grid->blank_count < 81 - filled) {
+    while(grid->blank_count < GRID_SIZE - filled) {
         int random_to_remove = random_in_range(80);
         if (grid->values[random_to_remove]) {
             int removed = grid->values[random_to_remove];
@@ -210,7 +199,7 @@ bool find_solution(Grid* grid, int current) {
 
 void set_blanks(Grid* grid) {
     grid->blank_count = 0;
-    for (int grid_i = 0; grid_i < 81; grid_i++) {
+    for (int grid_i = 0; grid_i < GRID_SIZE; grid_i++) {
         if (grid->values[grid_i] == 0) {
             grid->blanks[grid->blank_count] = grid_i;
             grid->blank_count++;
@@ -254,5 +243,5 @@ int get_grid_value(Grid* grid, Position pos) {
 
 
 int position_on_grid(Position pos) {
-    return (pos.y * 9) + pos.x;
+    return (pos.y * GROUP_SIZE) + pos.x;
 }

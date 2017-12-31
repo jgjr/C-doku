@@ -7,28 +7,30 @@
 #include "sudoku.h"
 #include "interface.h"
 
-void save_grid(Grid* grid, char* grid_file_path) {
+bool save_grid(Grid* grid, char* grid_file_path) {
     FILE *grid_file = fopen(grid_file_path, "w");
     if (grid_file == NULL) {
         printw("Error saving grid!\n");
-        return;
+        return false;
     }
     for (int grid_i = 0; grid_i < 81; grid_i++) {
         fprintf(grid_file, "%d", grid->values[grid_i]);
     } 
     fclose(grid_file);
+    return true;
 }
 
 
-void open_grid(Grid* grid, char* grid_file_path) {
+bool open_grid(Grid* grid, char* grid_file_path) {
     FILE *grid_file = fopen(grid_file_path, "r");
     if (grid_file == NULL) {
-        return;
+        return false;
     }
     for (int grid_i = 0; grid_i < 81; grid_i++) {
         fscanf(grid_file, "%1d", &grid->values[grid_i]);
     } 
     fclose(grid_file);
+    return true;
 }
 
 
@@ -65,12 +67,14 @@ void redo(Grids grids) {
 
 int main(int argc, char *argv[]){
 
+    /* Setup for ncurses and random number generation */
     srand(time(NULL));
     initscr();
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
 
+    /* Setup for the grid file */
     char* grid_file_path;
     char* grid_file_name = "/.grid.cdoku";
     grid_file_path = malloc(strlen(getenv("HOME")) + strlen(grid_file_name) + 1);
@@ -80,6 +84,8 @@ int main(int argc, char *argv[]){
     /* The key pressed by the user and its integer representation */
     char c;
     int c_int;
+    int filled = 35;
+
     Position position = { .x = 0, .y = 0 };
     Grid* grid = new_blank_grid();
     Grid* undo_grid = new_blank_grid();
@@ -92,7 +98,6 @@ int main(int argc, char *argv[]){
     print_grid(grid); 
 
     /* If a difficulty level has been specified */
-    int filled = 35;
     if (argc > 1) {
         if(strcmp(argv[1], "easy") == 0) {
             filled = 40;
