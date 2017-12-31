@@ -143,19 +143,19 @@ int main(int argc, char *argv[]){
                 print_message("NEW GAME", &position);
                 break;
             case 's':
-                store_undo(grids);
-                if (solve_game(grid) == true) {
+                if(is_grid_valid(grid) == false) {
+                    print_message("INVALID", &position);
+                } else {
+                    store_undo(grids);
+                    solve_game(grid);
                     print_grid(grid);
                     print_message("SOLVED", &position);
-                } else {
-                    print_grid(grid);
-                    print_message("INVALID", &position);
                 }
                 break;
             case 'm':
                 if(is_grid_valid(grid) == false) {
                     print_message("INVALID", &position);
-                } else if (is_new_grid_valid(*grid) == true) {
+                } else if (single_solution(*grid) == true) {
                     print_message("SINGLE SOLUTION", &position);
                 } else {
                     print_message("MULTIPLE SOLUTIONS", &position);

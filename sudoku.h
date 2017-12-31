@@ -51,13 +51,13 @@ void new_complete_grid(Grid* grid);
 
 void new_game(Grid* grid, int filled);
 
-bool solve_game(Grid* grid);
+void solve_game(Grid* grid);
 
 bool find_solution(Grid* grid, int current_blank);
 
 void set_blanks(Grid* grid);
 
-bool is_new_grid_valid(Grid grid);
+bool single_solution(Grid grid);
 
 int num_solutions(Grid* grid, int current, int solutions);
 

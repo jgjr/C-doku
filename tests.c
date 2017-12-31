@@ -52,6 +52,26 @@ int incomplete_valid_grid[81] = {0, 2, 3, 4, 5, 6, 7, 8, 9,
     6, 4, 2, 9, 7, 8, 5, 3, 1,
     9, 7, 8, 5, 3, 1, 6, 4, 0};
 
+int single_solution_game[81] = {7, 0, 1, 0, 5, 0, 0, 4, 0,
+    0, 2, 5, 3, 0, 0, 8, 0, 1,
+    0, 0, 4, 6, 0, 9, 0, 7, 5,
+    0, 7, 3, 9, 8, 0, 5, 1, 0,
+    0, 0, 2, 0, 0, 0, 4, 0, 0,
+    0, 0, 0, 0, 0, 1, 6, 3, 7,
+    8, 4, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 2, 0, 0, 1, 6, 0,
+    2, 0, 6, 0, 0, 3, 0, 0, 8};
+
+int multiple_solution_game[81] = {0, 0, 0, 0, 5, 0, 0, 4, 0,
+    0, 2, 5, 3, 0, 0, 8, 0, 1,
+    0, 0, 4, 6, 0, 9, 0, 7, 5,
+    0, 7, 3, 9, 8, 0, 5, 1, 0,
+    0, 0, 2, 0, 0, 0, 4, 0, 0,
+    0, 0, 0, 0, 0, 1, 6, 3, 7,
+    8, 4, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 2, 0, 0, 1, 6, 0,
+    2, 0, 6, 0, 0, 3, 0, 0, 8};
+
 int bad_rows_grid[81] = {0, 0, 1, 1, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -91,84 +111,74 @@ void test_new_blank_grid(void **state) {
     assert_int_equal(grid->blank_count, 81);
 }
 
-void test_clone_grid(void **state) {
-    Grid* grid1 = new_blank_grid();
-    grid1->values[80] = 8;
-    grid1->blanks[80] = 0;
-    grid1->blank_count = 80;
-    Grid* grid2 = clone_grid(*grid1);
-    assert_int_equal(grid2->values[80], 8);
-    assert_int_equal(grid2->blanks[80], 0);
-    assert_int_equal(grid2->blank_count, 80);
-}
-
 void test_check_rows(void **state) {
     Grid grid;
     memcpy(grid.values, bad_rows_grid, sizeof(bad_rows_grid));
-    assert_false(check_rows(grid));
+    assert_false(check_rows(&grid));
     Grid grid2;
     memcpy(grid2.values, complete_valid_grid, sizeof(complete_valid_grid));
-    assert_true(check_rows(grid2));
+    assert_true(check_rows(&grid2));
 }
 
 void test_check_cols(void **state) {
     Grid grid;
     memcpy(grid.values, bad_cols_grid, sizeof(bad_rows_grid));
-    assert_false(check_cols(grid));
+    assert_false(check_cols(&grid));
     Grid grid2;
     memcpy(grid2.values, complete_valid_grid, sizeof(complete_valid_grid));
-    assert_true(check_cols(grid2));
+    assert_true(check_cols(&grid2));
 }
 
 void test_check_boxes(void **state) {
     Grid grid;
     memcpy(grid.values, bad_boxes_grid, sizeof(bad_boxes_grid));
-    assert_false(check_boxes(grid));
+    assert_false(check_boxes(&grid));
     Grid grid2;
     memcpy(grid2.values, complete_valid_grid, sizeof(complete_valid_grid));
-    assert_true(check_boxes(grid2));
+    assert_true(check_boxes(&grid2));
 }
 
 void test_is_grid_valid(void **state) {
     Grid grid;
     memcpy(grid.values, bad_boxes_grid, sizeof(bad_boxes_grid));
-    assert_false(is_grid_valid(grid));
+    assert_false(is_grid_valid(&grid));
     Grid grid2;
     memcpy(grid2.values, complete_valid_grid, sizeof(complete_valid_grid));
-    assert_true(is_grid_valid(grid2));
+    assert_true(is_grid_valid(&grid2));
 }
 
 void test_is_grid_complete(void **state) {
     Grid grid;
     memcpy(grid.values, incomplete_valid_grid, sizeof(bad_boxes_grid));
-    assert_false(is_grid_complete(grid));
+    assert_false(is_grid_complete(&grid));
     Grid grid2;
     memcpy(grid2.values, complete_valid_grid, sizeof(complete_valid_grid));
-    assert_true(is_grid_complete(grid2));
+    assert_true(is_grid_complete(&grid2));
 }
 
 void test_find_random_valid_entry(void **state) {
     Grid grid;
     memcpy(grid.values, incomplete_valid_grid, sizeof(incomplete_valid_grid));
-    int val = find_random_valid_entry(grid, 80);
+    int val = find_random_valid_entry(&grid, 80);
     assert_int_equal(val, 2);
 }
 
 void test_find_incremented_valid_entry(void **state) {
     Grid grid;
     memcpy(grid.values, complete_valid_grid, sizeof(complete_valid_grid));
-    int val = find_incremented_valid_entry(grid, 80, 2);
+    int val = find_incremented_valid_entry(&grid, 80, 2);
     assert_int_equal(val, 0);
     Grid grid2;
     memcpy(grid2.values, blank_grid, sizeof(blank_grid));
-    int val2 = find_incremented_valid_entry(grid2, 0, 0);
+    int val2 = find_incremented_valid_entry(&grid2, 0, 0);
     assert_int_equal(val2, 1);
 }
 
 void test_new_complete_grid(void **state) {
-    Grid* grid = new_complete_grid();
-    assert_true(is_grid_valid(*grid));
-    assert_true(is_grid_complete(*grid));
+    Grid* grid = new_blank_grid();
+    new_complete_grid(grid);
+    assert_true(is_grid_valid(grid));
+    assert_true(is_grid_complete(grid));
     int total = 0;
     for (int grid_i = 0; grid_i < 81; grid_i++) {
         total += grid->values[grid_i];
@@ -177,9 +187,10 @@ void test_new_complete_grid(void **state) {
 }
 
 void test_new_game(void **state) {
-    Grid* grid = new_game(35);
+    Grid* grid = new_blank_grid();
+    new_game(grid, 35);
     set_blanks(grid);
-    assert_true(is_grid_valid(*grid));
+    assert_true(is_grid_valid(grid));
     assert_int_equal(grid->blank_count, 46);
 } 
 
@@ -191,6 +202,19 @@ void test_solve_game(void **state) {
     assert_int_equal(grid->values[80], 2);
 }
 
+void test_find_solution(void **state) {
+    Grid* grid = new_blank_grid();
+    memcpy(grid->values, incomplete_valid_grid, sizeof(incomplete_valid_grid));
+    set_blanks(grid);
+    find_solution(grid, 0);
+    assert_int_equal(grid->values[0], 1);
+    assert_int_equal(grid->values[80], 2);
+    Grid grid2;
+    memcpy(grid2.values, bad_boxes_grid, sizeof(bad_boxes_grid));
+    set_blanks(&grid2);
+    assert_false(find_solution(&grid2, 0));
+}
+
 void test_set_blanks(void **state) {
     Grid* grid = new_blank_grid();
     memcpy(grid->values, incomplete_valid_grid, sizeof(incomplete_valid_grid));
@@ -200,29 +224,20 @@ void test_set_blanks(void **state) {
     assert_int_equal(grid->blanks[1], 80);
 }
 
-void test_is_new_grid_valid(void **state) {
+void test_single_solution(void **state) {
     Grid* grid = new_blank_grid();
-    memcpy(grid->values, incomplete_valid_grid, sizeof(incomplete_valid_grid));
-    assert_true(is_new_grid_valid(*grid));
+    memcpy(grid->values, single_solution_game, sizeof(single_solution_game));
+    assert_true(single_solution(*grid));
     Grid* grid2 = new_blank_grid();
-    assert_false(is_new_grid_valid(*grid2));
-}
-
-void test_num_solutions(void **state) {
-    Grid* grid = new_blank_grid();
-    memcpy(grid->values, incomplete_valid_grid, sizeof(incomplete_valid_grid));
-    set_blanks(grid);
-    assert_int_equal(num_solutions(grid, 0, 0), 1);
-    Grid* grid2 = new_blank_grid();
-    set_blanks(grid2);
-    assert_in_range(num_solutions(grid2, 0, 0), 2, 2147483647);
+    memcpy(grid2->values, multiple_solution_game, sizeof(multiple_solution_game));
+    assert_false(single_solution(*grid2));
 }
 
 void test_get_grid_value(void **state) {
     Position pos = { .x = 2, .y = 3 };
     Grid* grid = new_blank_grid();
     memcpy(grid->values, complete_valid_grid, sizeof(complete_valid_grid));
-    assert_int_equal(get_grid_value(*grid, pos), 4); 
+    assert_int_equal(get_grid_value(grid, pos), 4); 
 }
 
 void test_position_on_grid(void **state) {
@@ -235,7 +250,6 @@ int main(void) {
         cmocka_unit_test(test_random_in_range),
         cmocka_unit_test(test_group_has_duplicates),
         cmocka_unit_test(test_new_blank_grid),
-        cmocka_unit_test(test_clone_grid),
         cmocka_unit_test(test_check_rows),
         cmocka_unit_test(test_check_cols),
         cmocka_unit_test(test_check_boxes),
@@ -246,9 +260,9 @@ int main(void) {
         cmocka_unit_test(test_new_complete_grid),
         cmocka_unit_test(test_new_game),
         cmocka_unit_test(test_solve_game),
+        cmocka_unit_test(test_find_solution),
         cmocka_unit_test(test_set_blanks),
-        cmocka_unit_test(test_is_new_grid_valid),
-        cmocka_unit_test(test_num_solutions),
+        cmocka_unit_test(test_single_solution),
         cmocka_unit_test(test_get_grid_value),
         cmocka_unit_test(test_position_on_grid),
     };

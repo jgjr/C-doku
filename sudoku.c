@@ -103,7 +103,6 @@ bool is_grid_complete(Grid* grid) {
 int find_random_valid_entry(Grid* grid, int square) {
     int tried[GROUP_SIZE] = {0};
     int tried_count = 0;
-    int ret = 0;
     while(tried_count <= 8) {
         int rand_int = random_in_range(8);
         if (tried[rand_int] == 0) {
@@ -111,28 +110,27 @@ int find_random_valid_entry(Grid* grid, int square) {
             tried_count++;
             grid->values[square] = rand_int + 1;
             if (is_grid_valid(grid) == true) {
-                ret = rand_int + 1;
-                break;
+                return rand_int + 1;
             }
         }
     }
-    return ret;
+    grid->values[square] = 0;
+    return 0;
 }
 
 
 int find_incremented_valid_entry(Grid* grid, int square, int start) {
-    int ret = 0;
     int val = start + 1;
     while(val <= GROUP_SIZE) {
         grid->values[square] = val;
         if (is_grid_valid(grid) == true) {
-            ret = val;
-            break;
+            return val;
         } else {
             val++;
         }
     }
-    return ret;
+    grid->values[square] = 0;
+    return 0;
 }
 
 
@@ -165,7 +163,7 @@ void new_game(Grid* grid, int filled) {
             int removed = grid->values[random_to_remove];
             grid->values[random_to_remove] = 0;
             grid->blank_count++;
-            if (is_new_grid_valid(*grid) == false) {
+            if (single_solution(*grid) == false) {
                 grid->values[random_to_remove] = removed;
                 grid->blank_count--;
             }
@@ -174,26 +172,24 @@ void new_game(Grid* grid, int filled) {
 }
 
 
-bool solve_game(Grid* grid) {
-    if (is_grid_valid(grid) == false)
-        return false;
+void solve_game(Grid* grid) {
     set_blanks(grid);
     find_solution(grid, 0);
-    return true;
 }
 
 
-bool find_solution(Grid* grid, int current) {
-    if (current >= grid->blank_count)
+bool find_solution(Grid* grid, int current_blank) {
+    if (current_blank >= grid->blank_count)
         return true;
-    int current_blank = grid->blanks[current];
-    grid->values[current_blank] = find_incremented_valid_entry(grid, current_blank, grid->values[current_blank]);
-    if (grid->values[current_blank] != 0) {
-        find_solution(grid, current + 1);
-    } else if(current > 0) {
-        find_solution(grid, current - 1);
+    int current_square = grid->blanks[current_blank];
+    int entry = find_incremented_valid_entry(grid, current_square, grid->values[current_square]);
+    if (entry != 0) {
+        find_solution(grid, current_blank + 1);
+    } else if(current_blank > 0) {
+        find_solution(grid, current_blank - 1);
+    } else {
+        return false;
     }
-    return false;
 }
 
 
@@ -208,31 +204,14 @@ void set_blanks(Grid* grid) {
 }
 
 
-bool is_new_grid_valid(Grid grid) {
-    set_blanks(&grid);
-    int num = num_solutions(&grid, 0, 0);
-    if (num == 1) {
+bool single_solution(Grid grid) {
+    solve_game(&grid);
+    grid.values[grid.blanks[grid.blank_count - 1]] = 0;
+    bool retry = find_solution(&grid, grid.blank_count - 2);
+    if (retry == false) {
         return true;
     } else {
         return false;
-    }
-}
-
-
-int num_solutions(Grid* grid, int current, int solutions) {
-    if (solutions > 1)
-        return solutions;
-    if (current >= grid->blank_count) {
-        solutions++;
-        solutions += num_solutions(grid, current - 1, solutions);
-        return solutions;
-    }
-    int current_blank = grid->blanks[current];
-    grid->values[current_blank] = find_incremented_valid_entry(grid, current_blank, grid->values[current_blank]);
-    if (grid->values[current_blank]) {
-        num_solutions(grid, current + 1, solutions);
-    } else if(current > 0) {
-        num_solutions(grid, current - 1, solutions);
     }
 }
 
