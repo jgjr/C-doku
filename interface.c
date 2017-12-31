@@ -2,11 +2,25 @@
 #include <curses.h>
 #include "sudoku.h"
 
+void print_divider_row(const chtype left, const chtype middle, const chtype right) {
+    addch(left);
+    for (int line_i = 0; line_i < 5; line_i++) 
+        addch(ACS_HLINE);
+    addch(middle);
+    for (int line_i = 0; line_i < 5; line_i++) 
+        addch(ACS_HLINE);
+    addch(middle);
+    for (int line_i = 0; line_i < 5; line_i++) 
+        addch(ACS_HLINE);
+    addch(right);
+    printw("\n");
+}
+
 void print_grid(Grid* grid) {
     erase();
-    printw("+-----+-----+-----+\n");
+    print_divider_row(ACS_ULCORNER, ACS_TTEE, ACS_URCORNER);
     for (int row_i = 0; row_i < GROUP_SIZE; row_i++) {
-        printw("|");
+        addch(ACS_VLINE);
         for (int column_i = 0; column_i < GROUP_SIZE; column_i++) {
             int grid_position = (row_i * GROUP_SIZE) + column_i;
             if (grid->values[grid_position] == 0)
@@ -14,14 +28,15 @@ void print_grid(Grid* grid) {
             else
                 printw("%d", grid->values[grid_position]);
             if ((column_i + 1) % 3 == 0)
-                printw("|");
+                addch(ACS_VLINE);
             else
                 printw(" ");
         }
         printw("\n");
-        if((row_i + 1) % 3 == 0)
-            printw("+-----+-----+-----+\n");
+        if((row_i + 1) % 3 == 0 && row_i != 8)
+            print_divider_row(ACS_LTEE, ACS_PLUS, ACS_RTEE);
     } 
+    print_divider_row(ACS_LLCORNER, ACS_BTEE, ACS_LRCORNER);
 }
 
 

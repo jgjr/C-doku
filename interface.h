@@ -3,6 +3,8 @@
 #ifndef INTERFACE_FUNCTIONS_H_
 #define INTERFACE_FUNCTIONS_H_
 
+void print_divider_row();
+
 void print_grid(Grid* grid);
 
 int* get_cursor_position(Position* position);
