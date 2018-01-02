@@ -1,3 +1,5 @@
+.POSIX:
+CC = gcc
 CFLAGS = -std=c99 -Wall -pedantic -Werror -Wextra -O3
 LDLIBS = -lncurses
 
