@@ -19,6 +19,7 @@ typedef struct Movement {
 typedef struct Grid {
    int values[GRID_SIZE];
    int blanks[GRID_SIZE];
+   int square_type[GRID_SIZE]; /* 0 is blank, 1 is pre-filled and 2 is solved by the application */
    int blank_count;
 } Grid;
 
@@ -51,7 +52,7 @@ void new_complete_grid(Grid* grid);
 
 void new_game(Grid* grid, int filled);
 
-void solve_game(Grid* grid);
+bool solve_game(Grid* grid);
 
 bool find_solution(Grid* grid, int current_blank);
 
@@ -61,8 +62,8 @@ bool single_solution(Grid grid);
 
 int num_solutions(Grid* grid, int current, int solutions);
 
-int get_grid_value(Grid* grid, Position pos);
+int get_grid_value(Grid* grid, Position* position);
 
-int position_on_grid(Position pos);
+int position_on_grid(Position* postion);
 
 #endif

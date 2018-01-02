@@ -17,6 +17,7 @@ void clear_grid(Grid* grid) {
     for (int grid_i = 0; grid_i < GRID_SIZE; grid_i++) {
         grid->values[grid_i] = 0;
         grid->blanks[grid_i] = grid_i;
+        grid->square_type[grid_i] = 0;
     } 
     grid->blank_count = GRID_SIZE;
 }
@@ -26,6 +27,7 @@ void replace_grid(Grid* source_grid, Grid* dest_grid) {
     for (int grid_i = 0; grid_i < GRID_SIZE; grid_i++) {
         dest_grid->values[grid_i] = source_grid->values[grid_i];
         dest_grid->blanks[grid_i] = source_grid->blanks[grid_i];
+        dest_grid->square_type[grid_i] = source_grid->square_type[grid_i];
     } 
     dest_grid->blank_count = source_grid->blank_count;
 }
@@ -64,8 +66,8 @@ bool check_boxes(Grid* grid) {
     for (int box_i = 0; box_i < 27; box_i++) {
         int box_x = ((box_i / GROUP_SIZE) * 3) + (box_i % 3);
         for (int box_j = 0; box_j < 3; box_j++) {
-            Position pos = {.x = box_x, .y = ((box_i % GROUP_SIZE) / 3) * 3 + box_j};
-            box.values[box.count] = get_grid_value(grid, pos);
+            Position position = {.x = box_x, .y = ((box_i % GROUP_SIZE) / 3) * 3 + box_j};
+            box.values[box.count] = get_grid_value(grid, &position);
             box.count++;
             if(box.count == GROUP_SIZE) {
                 if (group_has_duplicates(box) == true) {
@@ -141,6 +143,7 @@ void new_complete_grid(Grid* grid) {
     while(i < GRID_SIZE) {
         int entry = find_random_valid_entry(grid, i);
         if (entry) {
+            grid->square_type[i] = 1;
             i++;
         } else {
             i = (i / GROUP_SIZE) * GROUP_SIZE;
@@ -162,9 +165,11 @@ void new_game(Grid* grid, int filled) {
         if (grid->values[random_to_remove]) {
             int removed = grid->values[random_to_remove];
             grid->values[random_to_remove] = 0;
+            grid->square_type[random_to_remove] = 0;
             grid->blank_count++;
             if (single_solution(*grid) == false) {
                 grid->values[random_to_remove] = removed;
+            grid->square_type[random_to_remove] = 1;
                 grid->blank_count--;
             }
         }
@@ -172,9 +177,9 @@ void new_game(Grid* grid, int filled) {
 }
 
 
-void solve_game(Grid* grid) {
+bool solve_game(Grid* grid) {
     set_blanks(grid);
-    find_solution(grid, 0);
+    return find_solution(grid, 0);
 }
 
 
@@ -184,8 +189,10 @@ bool find_solution(Grid* grid, int current_blank) {
     int current_square = grid->blanks[current_blank];
     int entry = find_incremented_valid_entry(grid, current_square, grid->values[current_square]);
     if (entry != 0) {
+        grid->square_type[current_square] = 2;
         return find_solution(grid, current_blank + 1);
     } else if(entry == 0 && current_blank > 0) {
+        grid->square_type[current_square] = 0;
         return find_solution(grid, current_blank - 1);
     } else {
         return false;
@@ -216,11 +223,11 @@ bool single_solution(Grid grid) {
 }
 
 
-int get_grid_value(Grid* grid, Position pos) {
-    return grid->values[position_on_grid(pos)];
+int get_grid_value(Grid* grid, Position* position) {
+    return grid->values[position_on_grid(position)];
 }
 
 
-int position_on_grid(Position pos) {
-    return (pos.y * GROUP_SIZE) + pos.x;
+int position_on_grid(Position* position) {
+    return (position->y * GROUP_SIZE) + position->x;
 }

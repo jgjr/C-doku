@@ -2,6 +2,22 @@
 #include <curses.h>
 #include "sudoku.h"
 
+void print_help_message() {
+    printf("\nUsage:\n");
+    printf("c-doku [-h/--help] - displays this help message\n");
+    printf("c-doku - opens saved game, or new medium grid if no file is present\n");
+    printf("c-soku [easy/medium/hard] - opens a new game with desired difficulty level\n");
+    printf("\nUseful keybindings:\n");
+    printf("n - new game\n");
+    printf("s - solve game\n");
+    printf("x - clear grid\n");
+    printf("v - validate grid\n");
+    printf("c - check if grid is complete\n");
+    printf("For complete list see README.md\n");
+    printf("\n");
+}
+
+
 void print_divider_row(const chtype left, const chtype middle, const chtype right) {
     addch(left);
     for (int line_i = 0; line_i < 5; line_i++) 
@@ -23,10 +39,19 @@ void print_grid(Grid* grid) {
         addch(ACS_VLINE);
         for (int column_i = 0; column_i < GROUP_SIZE; column_i++) {
             int grid_position = (row_i * GROUP_SIZE) + column_i;
-            if (grid->values[grid_position] == 0)
+            if (grid->values[grid_position] == 0) {
                 printw(" ");
-            else
+            } else if (grid->square_type[grid_position] == 0) {
+                attron(COLOR_PAIR(1));
                 printw("%d", grid->values[grid_position]);
+                attroff(COLOR_PAIR(1));
+            } else if (grid->square_type[grid_position] == 2) {
+                attron(COLOR_PAIR(2));
+                printw("%d", grid->values[grid_position]);
+                attroff(COLOR_PAIR(2));
+            } else {
+                printw("%d", grid->values[grid_position]);
+            }
             if ((column_i + 1) % 3 == 0)
                 addch(ACS_VLINE);
             else
@@ -40,22 +65,6 @@ void print_grid(Grid* grid) {
 }
 
 
-int* get_cursor_position(Position* position) {
-    int* cursor = malloc(sizeof(int) * 2);
-    cursor[1] = (position->x * 2) + 1;
-    cursor[0] = position->y + 1 + (position->y / 3);
-    return cursor;
-}
-
-
-void position_cursor(Position* position) {
-    int* cursor_position = get_cursor_position(position);
-    move(cursor_position[0], cursor_position[1]);
-    refresh();
-    free(cursor_position);
-}
-
-
 void make_move(int direction_x, int direction_y, Position* position) {
     if (position->x + direction_x >= 0 &&
         position->x + direction_x <= GROUP_SIZE - 1 &&
@@ -64,16 +73,19 @@ void make_move(int direction_x, int direction_y, Position* position) {
     {
         position->x += direction_x;
         position->y += direction_y;
-        position_cursor(position);
+        move(position->y + 1 + (position->y / 3), (position->x * 2) + 1);
+        refresh();
     }
 }
 
 
 void add_number(Grid* grid, int c, Position* position) {
-    int grid_position = (position->y * GROUP_SIZE) + position->x;
-    grid->values[grid_position] = c;
-    print_grid(grid);
-    make_move(0, 0, position);
+    int grid_position = position_on_grid(position);
+    if (grid->square_type[grid_position] == 0) {
+        grid->values[grid_position] = c;
+        print_grid(grid);
+        make_move(0, 0, position);
+    }
 }
 
 
@@ -82,4 +94,18 @@ void print_message(char* message, Position* position) {
     clrtoeol();
     printw("%s", message);
     make_move(0, 0, position);
+}
+
+void editable(Grid* grid) {
+    for (int grid_i = 0; grid_i < GRID_SIZE; grid_i++) {
+        grid->square_type[grid_i] = 0;
+    } 
+}
+
+
+void lock(Grid* grid) {
+    for (int grid_i = 0; grid_i < GRID_SIZE; grid_i++) {
+        if (grid->values[grid_i] != 0)
+            grid->square_type[grid_i] = 1;
+    } 
 }

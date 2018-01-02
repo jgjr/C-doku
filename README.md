@@ -1,6 +1,6 @@
 # C-doku
 
-![Preview](https://i.imgur.com/e51hLYw.gif)
+![Preview](https://i.imgur.com/6NUzs6Z.gif)
 
 A command line sudoku game written in C. It can generate new games, solve games, validate games, and tell if there is a single solution to a game (thus validating new games). The game itself uses the [ncurses](https://www.gnu.org/software/ncurses/) library, and the tests rely on [cmocka](https://cmocka.org/). 
 
@@ -19,17 +19,17 @@ There are no mandatory arguments when running c-doku, however there is an option
 When saving, the game will be stored in the ~/.grid.cdoku file. When reopening the application, C-doku will try to find your saved grid in this file, and if there is no grid present, it will start with a new grid. 
 The -h and --help arguments will display a short help message.
 
-## Key bindings
+## Keybindings
 C-doku has vim-like keybindings. See the image or table below. 
 
-![Keybindings](https://i.imgur.com/Fe0yt1t.png)
+![Keybindings](https://i.imgur.com/qrV2Hm0.png)
 
 | Key                           | Action                                                             |
 |:------------------------------|:-------------------------------------------------------------------|
-|`h`                            | Move left |
-|`j`                            | Move down |
-|`k`                            | Move up |
-|`l`                            | Move right |
+|`h / ←`                        | Move left |
+|`j / ↓`                        | Move down |
+|`k / ↑`                        | Move up |
+|`l / →`                        | Move right |
 |`^`                            | Beginning of row |
 |`&`                            | End of row |
 |`g`                            | Top of column |
@@ -48,4 +48,6 @@ C-doku has vim-like keybindings. See the image or table below.
 |`d`                            | Delete |
 |`c`                            | Complete / Incomplete |
 |`m`                            | Multiple solutions |
+|`e`                            | All squares editable |
+|`o`                            | All filled squares locked |
 |`space`                        | Clear message |

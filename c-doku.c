@@ -7,14 +7,19 @@
 #include "sudoku.h"
 #include "interface.h"
 
+
 bool save_grid(Grid* grid, char* grid_file_path) {
     FILE *grid_file = fopen(grid_file_path, "w");
     if (grid_file == NULL) {
         printw("Error saving grid!\n");
         return false;
     }
-    for (int grid_i = 0; grid_i < 81; grid_i++) {
+    for (int grid_i = 0; grid_i < GRID_SIZE; grid_i++) {
         fprintf(grid_file, "%d", grid->values[grid_i]);
+    } 
+    fprintf(grid_file, "\n");
+    for (int grid_j = 0; grid_j < GRID_SIZE; grid_j++) {
+        fprintf(grid_file, "%d", grid->square_type[grid_j]);
     } 
     fclose(grid_file);
     return true;
@@ -26,8 +31,11 @@ bool open_grid(Grid* grid, char* grid_file_path) {
     if (grid_file == NULL) {
         return false;
     }
-    for (int grid_i = 0; grid_i < 81; grid_i++) {
+    for (int grid_i = 0; grid_i < GRID_SIZE; grid_i++) {
         fscanf(grid_file, "%1d", &grid->values[grid_i]);
+    } 
+    for (int grid_j = 0; grid_j < GRID_SIZE; grid_j++) {
+        fscanf(grid_file, "%1d", &grid->square_type[grid_j]);
     } 
     fclose(grid_file);
     return true;
@@ -70,18 +78,7 @@ int main(int argc, char *argv[]){
 
     /* Display a help message if the -h option is specified */
     if (argc > 1 && (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0)) {
-        printf("\nUsage:\n");
-        printf("c-doku [-h/--help] - displays this help message\n");
-        printf("c-doku - opens saved game, or new medium grid if no file is present\n");
-        printf("c-soku [easy/medium/hard] - opens a new game with desired difficulty level\n");
-        printf("\nUseful keybindings:\n");
-        printf("n - new game\n");
-        printf("s - solve game\n");
-        printf("x - clear grid\n");
-        printf("v - validate grid\n");
-        printf("c - check if grid is complete\n");
-        printf("For complete list see README.md\n");
-        printf("\n");
+        print_help_message();
         return 0;
     }
 
@@ -92,6 +89,11 @@ int main(int argc, char *argv[]){
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
+    start_color();
+    use_default_colors();
+    init_pair(0, COLOR_WHITE, COLOR_BLACK);
+    init_pair(1, COLOR_CYAN, COLOR_BLACK);
+    init_pair(2, COLOR_MAGENTA, COLOR_BLACK);
 
 
     /* Setup for the grid file */
@@ -165,6 +167,12 @@ int main(int argc, char *argv[]){
                 save_grid(grid, grid_file_path);
                 print_message("SAVED", &position);
                 break;
+            case 'f':
+                store_undo(grids);
+                new_complete_grid(grid);
+                print_grid(grid);
+                print_message("NEW COMPLETED GRID", &position);
+                break;
             case 'n':
                 store_undo(grids);
                 new_game(grid, filled);
@@ -176,9 +184,13 @@ int main(int argc, char *argv[]){
                     print_message("INVALID", &position);
                 } else {
                     store_undo(grids);
-                    solve_game(grid);
-                    print_grid(grid);
-                    print_message("SOLVED", &position);
+                    if (solve_game(grid) == true) {
+                        print_grid(grid);
+                        print_message("SOLVED", &position);
+                    } else {
+                        print_grid(grid);
+                        print_message("CANNOT SOLVE", &position);
+                    }
                 }
                 break;
             case 'm':
@@ -255,6 +267,20 @@ int main(int argc, char *argv[]){
                 break;
             case 'G':
                 make_move(0, 8 - position.y, &position);
+                break;
+            case 'e':
+                store_undo(grids);
+                editable(grid);
+                print_grid(grid);
+                make_move(0, 0, &position);
+                print_message("EDITABLE", &position);
+                break;
+            case 'o':
+                store_undo(grids);
+                lock(grid);
+                print_grid(grid);
+                make_move(0, 0, &position);
+                print_message("LOCKED", &position);
                 break;
             default:
                 c_int = c - '0';
