@@ -1,10 +1,13 @@
-CFLAGS = -std=c99 -Wall -Wextra -O3
+CFLAGS = -std=c99 -Wall -pedantic -Werror -Wextra -O3
 LDLIBS = -lncurses
 
 obj = c-doku.o helpers.o interface.o sudoku.o
 testobj = helpers.o sudoku.o tests.o
 
 all: c-doku
+
+play: c-doku
+	./c-doku
 
 check: tests
 	./tests
