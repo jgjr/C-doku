@@ -237,12 +237,12 @@ void test_get_grid_value(void **state) {
     Position pos = { .x = 2, .y = 3 };
     Grid* grid = new_blank_grid();
     memcpy(grid->values, complete_valid_grid, sizeof(complete_valid_grid));
-    assert_int_equal(get_grid_value(grid, pos), 4); 
+    assert_int_equal(get_grid_value(grid, &pos), 4); 
 }
 
 void test_position_on_grid(void **state) {
     Position pos = { .x = 2, .y = 3 };
-    assert_int_equal(position_on_grid(pos), 29);
+    assert_int_equal(position_on_grid(&pos), 29);
 }
 
 int main(void) {
