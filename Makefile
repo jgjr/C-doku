@@ -1,13 +1,25 @@
-all: output
+CFLAGS = -std=c99 -Wall -Wextra -O3
+LDLIBS = -lncurses
 
-output: c-doku.c sudoku.c helpers.c interface.c
-	gcc helpers.c sudoku.c interface.c c-doku.c -o c-doku -lncurses -ltinfo
+obj = c-doku.o helpers.o interface.o sudoku.o
+testobj = helpers.o sudoku.o tests.o
 
-debug: c-doku.c sudoku.c helpers.c interface.c
-	gcc -g helpers.c sudoku.c interface.c c-doku.c -o c-doku.x -lncurses -ltinfo
+all: c-doku
 
-test: tests.c c-doku.c sudoku.c helpers.c interface.c
-	gcc helpers.c sudoku.c tests.c -o tests -lcmocka && ./tests
+check: tests
+	./tests
+
+c-doku: $(obj)
+	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ $(obj) $(LDLIBS)
+
+tests: $(testobj)
+	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ $(testobj) -lcmocka
+
+c-doku.o: c-doku.c sudoku.h interface.h
+helpers.o: helpers.c sudoku.h
+interface.o: interface.c sudoku.h
+sudoku.o: sudoku.c helpers.h sudoku.h
+tests.o: tests.c helpers.h sudoku.h
 
 clean:
-	 rm c-doku c-doku.x 
+	rm -f c-doku tests c-doku.x $(obj) $(testobj)

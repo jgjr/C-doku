@@ -1,2 +1,10 @@
 c-doku
+c-doku.o
+helpers.o
+interface.o
+LICENSE
+Makefile
+README.md
+sudoku.o
 tests
+tests.o
