@@ -22,7 +22,7 @@ The -h and --help arguments will display a short help message.
 ## Keybindings
 C-doku has vim-like keybindings. See the image or table below. 
 
-![Keybindings](https://i.imgur.com/qrV2Hm0.png)
+![Keybindings](https://i.imgur.com/ffKGdyk.png)
 
 | Key                           | Action                                                             |
 |:------------------------------|:-------------------------------------------------------------------|
@@ -39,14 +39,15 @@ C-doku has vim-like keybindings. See the image or table below.
 |`G`                            | Bottom of column |
 |`w`                            | Save |
 |`q`                            | Quit |
-|`n`                            | New Grid |
-|`x`                            | Clear Grid |
+|`n`                            | New grid |
+|`f`                            | New completed grid |
+|`x`                            | Clear grid |
 |`s`                            | Solve |
 |`v`                            | Validate |
 |`u`                            | Undo |
 |`r`                            | Redo |
 |`d`                            | Delete |
-|`c`                            | Complete / Incomplete |
+|`c`                            | Complete / incomplete |
 |`m`                            | Multiple solutions |
 |`e`                            | All squares editable |
 |`o`                            | All filled squares locked |
