@@ -84,21 +84,13 @@ bool check_boxes(Grid* grid) {
 
 
 bool is_grid_valid(Grid* grid) {
-    if (check_rows(grid) == false || check_cols(grid) == false || check_boxes(grid) == false) {
-        return false;
-    } else {
-        return true;
-    }
+    return check_rows(grid) && check_cols(grid) && check_boxes(grid);
 }
 
 
 bool is_grid_complete(Grid* grid) {
     set_blanks(grid);
-    if(grid->blank_count > 0) {
-        return false;        
-    } else {
-        return true;
-    }
+    return grid->blank_count == 0;
 }
 
 
@@ -194,9 +186,8 @@ bool find_solution(Grid* grid, int current_blank) {
     } else if(entry == 0 && current_blank > 0) {
         grid->square_type[current_square] = 0;
         return find_solution(grid, current_blank - 1);
-    } else {
-        return false;
     }
+    return false;
 }
 
 
@@ -215,11 +206,7 @@ bool single_solution(Grid grid) {
     solve_game(&grid);
     grid.values[grid.blanks[grid.blank_count - 1]] = 0;
     bool retry = find_solution(&grid, grid.blank_count - 2);
-    if (retry == false) {
-        return true;
-    } else {
-        return false;
-    }
+    return retry == false;
 }
 
 
